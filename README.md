@@ -129,7 +129,19 @@ docker-compose -f docker-compose.prod.yml up -d
 | `DOCKERHUB_USERNAME` | Your Docker Hub username |
 | `DOCKERHUB_TOKEN` | Docker Hub access token |
 | `EC2_HOST` | Public IP or DNS of your EC2 instance |
-| `EC2_SSH_KEY` | Private key for EC2 SSH access |
+| `EC2_SSH_KEY` | Contents of your EC2 `.pem` key file |
+
+See **[deploy/AWS_DEPLOYMENT.md](deploy/AWS_DEPLOYMENT.md)** for the complete step-by-step guide.
+
+---
+
+## Postman Collection
+
+Import `deploy/school-management-api.postman_collection.json` into Postman.
+
+Set the `baseUrl` variable:
+- Local: `http://localhost:3000`
+- Production: `http://YOUR_EC2_PUBLIC_IP:3000`
 
 ---
 

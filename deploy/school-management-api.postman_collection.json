@@ -1,0 +1,166 @@
+{
+  "info": {
+    "name": "School Management API",
+    "_postman_id": "school-mgmt-api-v1",
+    "description": "API collection for the School Management internship assignment.\n\nEndpoints:\n- POST /addSchool — Add a new school\n- GET /listSchools — List schools sorted by proximity\n- GET /health — Server health check\n\nSet the `baseUrl` variable to switch between local and live environments.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "description": "Switch to your EC2 public IP for production: http://YOUR_EC2_IP:3000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/health",
+        "description": "Verify the server is running. Returns uptime in seconds."
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Server is running\",\n  \"uptime\": 42.35\n}"
+        }
+      ]
+    },
+    {
+      "name": "Add School — Success",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/addSchool",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Delhi Public School\",\n  \"address\": \"Sector 45, Noida, Uttar Pradesh\",\n  \"latitude\": 28.5706,\n  \"longitude\": 77.3261\n}"
+        },
+        "description": "Adds a new school. All four fields are required. Latitude must be -90 to 90, longitude -180 to 180."
+      },
+      "response": [
+        {
+          "name": "201 Created",
+          "status": "Created",
+          "code": 201,
+          "body": "{\n  \"success\": true,\n  \"message\": \"School added successfully\",\n  \"data\": { \"id\": 1 }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Add School — Missing Fields (400)",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/addSchool",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Incomplete School\"\n}"
+        },
+        "description": "Demonstrates validation — missing address, latitude, longitude."
+      },
+      "response": [
+        {
+          "name": "400 Bad Request",
+          "status": "Bad Request",
+          "code": 400,
+          "body": "{\n  \"success\": false,\n  \"message\": \"Validation failed\",\n  \"errors\": [\n    \"address is required\",\n    \"latitude is required\",\n    \"longitude is required\"\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "Add School — Invalid Coordinates (400)",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/addSchool",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Bad Coords School\",\n  \"address\": \"Somewhere, India\",\n  \"latitude\": 999,\n  \"longitude\": 77.3261\n}"
+        },
+        "description": "Latitude 999 is out of range — must be -90 to 90."
+      },
+      "response": [
+        {
+          "name": "400 Bad Request",
+          "status": "Bad Request",
+          "code": 400,
+          "body": "{\n  \"success\": false,\n  \"message\": \"Validation failed\",\n  \"errors\": [\"latitude must be between -90 and 90\"]\n}"
+        }
+      ]
+    },
+    {
+      "name": "List Schools — From Delhi",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/listSchools?latitude=28.6139&longitude=77.2090",
+          "host": ["{{baseUrl}}"],
+          "path": ["listSchools"],
+          "query": [
+            { "key": "latitude",  "value": "28.6139", "description": "User's latitude (Delhi)" },
+            { "key": "longitude", "value": "77.2090", "description": "User's longitude (Delhi)" }
+          ]
+        },
+        "description": "Returns all schools sorted nearest-first from Delhi coordinates. distance_km is calculated server-side using the Haversine formula."
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Found 3 school(s), sorted by proximity\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"Delhi Public School\",\n      \"address\": \"Sector 45, Noida, UP\",\n      \"latitude\": 28.5706,\n      \"longitude\": 77.3261,\n      \"distance_km\": 12.43\n    },\n    {\n      \"id\": 3,\n      \"name\": \"Kendriya Vidyalaya\",\n      \"address\": \"Shankar Nagar, Raipur, CG\",\n      \"latitude\": 21.2514,\n      \"longitude\": 81.6296,\n      \"distance_km\": 895.21\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "List Schools — From Raipur",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/listSchools?latitude=21.2514&longitude=81.6296",
+          "host": ["{{baseUrl}}"],
+          "path": ["listSchools"],
+          "query": [
+            { "key": "latitude",  "value": "21.2514", "description": "User's latitude (Raipur)" },
+            { "key": "longitude", "value": "81.6296", "description": "User's longitude (Raipur)" }
+          ]
+        },
+        "description": "Same data, different user location — ordering changes."
+      },
+      "response": []
+    },
+    {
+      "name": "List Schools — Missing Params (400)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/listSchools?latitude=28.6139",
+          "host": ["{{baseUrl}}"],
+          "path": ["listSchools"],
+          "query": [
+            { "key": "latitude", "value": "28.6139" }
+          ]
+        },
+        "description": "Missing longitude — demonstrates query param validation."
+      },
+      "response": [
+        {
+          "name": "400 Bad Request",
+          "status": "Bad Request",
+          "code": 400,
+          "body": "{\n  \"success\": false,\n  \"message\": \"Validation failed\",\n  \"errors\": [\"longitude query param is required\"]\n}"
+        }
+      ]
+    }
+  ]
+}
