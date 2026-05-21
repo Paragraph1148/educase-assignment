@@ -3,7 +3,6 @@
 Node.js REST API for managing school data — built with Express, TypeScript, MySQL, Docker, and deployed on AWS.
 
 ## Tech Stack
-
 - **Runtime:** Node.js + TypeScript
 - **Framework:** Express.js
 - **Database:** MySQL (local via Docker, production via AWS RDS)
@@ -18,12 +17,10 @@ Node.js REST API for managing school data — built with Express, TypeScript, My
 ## Quick Start (Local)
 
 ### Prerequisites
-
 - Node.js 18+
 - Docker + Docker Compose
 
 ### 1. Clone & install
-
 ```bash
 git clone https://github.com/YOUR_USERNAME/school-management-api.git
 cd school-management-api
@@ -31,20 +28,17 @@ npm install
 ```
 
 ### 2. Environment
-
 ```bash
 cp .env.example .env
 # Edit .env with your DB credentials
 ```
 
 ### 3. Run with Docker Compose (app + MySQL together)
-
 ```bash
 docker-compose up --build
 ```
 
 ### 4. Run locally (if MySQL is already running)
-
 ```bash
 npm run dev
 ```
@@ -54,11 +48,9 @@ npm run dev
 ## API Reference
 
 ### POST /addSchool
-
 Add a new school.
 
 **Request body:**
-
 ```json
 {
   "name": "Delhi Public School",
@@ -69,7 +61,6 @@ Add a new school.
 ```
 
 **Response (201):**
-
 ```json
 {
   "success": true,
@@ -81,11 +72,9 @@ Add a new school.
 ---
 
 ### GET /listSchools?latitude=28.61&longitude=77.20
-
 Returns all schools sorted by proximity to the given coordinates.
 
 **Response (200):**
-
 ```json
 {
   "success": true,
@@ -105,21 +94,59 @@ Returns all schools sorted by proximity to the given coordinates.
 
 ---
 
+## Docker
+
+### Local development (app + MySQL in containers)
+```bash
+# Start everything
+docker-compose up --build
+
+# Run in background
+docker-compose up -d --build
+
+# View logs
+docker-compose logs -f api
+
+# Stop and remove containers
+docker-compose down
+
+# Stop and ALSO delete DB volume (full reset)
+docker-compose down -v
+```
+
+### Production (EC2 — DB is RDS, only API container)
+```bash
+# On your EC2 instance
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+---
+
+## GitHub Secrets Required for CI/CD
+
+| Secret | Description |
+|---|---|
+| `DOCKERHUB_USERNAME` | Your Docker Hub username |
+| `DOCKERHUB_TOKEN` | Docker Hub access token |
+| `EC2_HOST` | Public IP or DNS of your EC2 instance |
+| `EC2_SSH_KEY` | Private key for EC2 SSH access |
+
+---
+
 ## Scripts
 
-| Command                 | Description                      |
-| ----------------------- | -------------------------------- |
-| `npm run dev`           | Start dev server with hot reload |
-| `npm run build`         | Compile TypeScript               |
-| `npm start`             | Run compiled JS                  |
-| `npm test`              | Run all tests                    |
-| `npm run test:coverage` | Tests + coverage report          |
-| `npm run lint`          | Lint check                       |
+| Command | Description |
+|---|---|
+| `npm run dev` | Start dev server with hot reload |
+| `npm run build` | Compile TypeScript |
+| `npm start` | Run compiled JS |
+| `npm test` | Run all tests |
+| `npm run test:coverage` | Tests + coverage report |
+| `npm run lint` | Lint check |
 
 ---
 
 ## Project Structure
-
 ```
 src/
 ├── config/db.ts          # MySQL connection pool

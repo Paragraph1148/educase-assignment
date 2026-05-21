@@ -1,0 +1,42 @@
+# Dependencies — installed fresh inside container
+node_modules/
+
+# TypeScript source — compiled to dist/ in builder stage
+# (src/ IS copied in builder, but excluded from final image via multi-stage)
+
+# Build artifacts
+dist/
+
+# Test files — not needed in production image
+tests/
+coverage/
+jest.config.ts
+
+# Environment — never bake secrets into image
+.env
+.env.*
+!.env.example
+
+# Git
+.git/
+.gitignore
+
+# Docker files themselves
+Dockerfile
+docker-compose*.yml
+docker/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# README
+README.md

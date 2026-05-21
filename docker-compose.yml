@@ -1,0 +1,64 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Local Development Stack
+# Usage: docker-compose up --build
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── MySQL ──────────────────────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: school_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-school_management}
+    ports:
+      - "3306:3306"           # expose to host so you can connect via TablePlus/DBeaver
+    volumes:
+      - mysql_data:/var/lib/mysql                 # persist data across restarts
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql  # auto-run on first start
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - school_network
+
+  # ── API ────────────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: school_api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DB_HOST: mysql              # service name, not localhost
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD:-rootpassword}
+      DB_NAME: ${DB_NAME:-school_management}
+    ports:
+      - "3000:3000"
+    depends_on:
+      mysql:
+        condition: service_healthy   # wait for MySQL to be ready before starting
+    networks:
+      - school_network
+
+# ─── Named Volumes ────────────────────────────────────────────────────────────
+volumes:
+  mysql_data:
+    driver: local
+
+# ─── Network ─────────────────────────────────────────────────────────────────
+networks:
+  school_network:
+    driver: bridge
