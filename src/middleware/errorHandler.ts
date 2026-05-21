@@ -6,7 +6,7 @@ import { ApiResponse } from "../types/school.types";
 export const notFoundHandler = (req: Request, res: Response): void => {
   const response: ApiResponse<null> = {
     success: false,
-    message: `Route ${req.method} ${req.originalUrl} not found`
+    message: `Route ${req.method} ${req.originalUrl} not found`,
   };
   res.status(404).json(response);
 };
@@ -15,10 +15,10 @@ export const notFoundHandler = (req: Request, res: Response): void => {
 
 export const errorHandler = (
   err: Error,
-  req: Request,
+  _req: Request,
   res: Response,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _next: NextFunction
+  _next: NextFunction,
 ): void => {
   console.error(`[ERROR] ${err.message}`);
 
@@ -27,7 +27,7 @@ export const errorHandler = (
     message:
       process.env.NODE_ENV === "production"
         ? "Internal server error"
-        : err.message
+        : err.message,
   };
 
   res.status(500).json(response);
