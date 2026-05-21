@@ -354,3 +354,48 @@ describe("404 handler", () => {
     expect(res.status).toBe(404);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Error handler — branch coverage for NODE_ENV="production"
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("Global error handler", () => {
+  it("returns generic message in production mode (hides internal error)", async () => {
+    // Simulate production env for this test only
+    const original = process.env.NODE_ENV;
+    process.env.NODE_ENV = "production";
+
+    mockExecute.mockRejectedValueOnce(new Error("secret db internals"));
+
+    const res = await request(app).post("/addSchool").send({
+      name: "Test School",
+      address: "Test Address Here",
+      latitude: 28.5706,
+      longitude: 77.3261,
+    });
+
+    process.env.NODE_ENV = original; // restore
+
+    expect(res.status).toBe(500);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toBe("Internal server error");
+    // Should NOT leak the real error message in production
+    expect(res.body.message).not.toContain("secret db internals");
+  });
+
+  it("returns real error message in development mode", async () => {
+    process.env.NODE_ENV = "development";
+
+    mockExecute.mockRejectedValueOnce(new Error("real dev error"));
+
+    const res = await request(app).post("/addSchool").send({
+      name: "Test School",
+      address: "Test Address Here",
+      latitude: 28.5706,
+      longitude: 77.3261,
+    });
+
+    expect(res.status).toBe(500);
+    expect(res.body.message).toBe("real dev error");
+  });
+});
