@@ -8,7 +8,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:3000",
+      "value": "http://3.226.241.204:3000",
       "description": "Switch to your EC2 public IP for production: http://YOUR_EC2_IP:3000"
     }
   ],
@@ -34,9 +34,7 @@
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/addSchool",
-        "header": [
-          { "key": "Content-Type", "value": "application/json" }
-        ],
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"name\": \"Delhi Public School\",\n  \"address\": \"Sector 45, Noida, Uttar Pradesh\",\n  \"latitude\": 28.5706,\n  \"longitude\": 77.3261\n}"
@@ -57,9 +55,7 @@
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/addSchool",
-        "header": [
-          { "key": "Content-Type", "value": "application/json" }
-        ],
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"name\": \"Incomplete School\"\n}"
@@ -80,9 +76,7 @@
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/addSchool",
-        "header": [
-          { "key": "Content-Type", "value": "application/json" }
-        ],
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"name\": \"Bad Coords School\",\n  \"address\": \"Somewhere, India\",\n  \"latitude\": 999,\n  \"longitude\": 77.3261\n}"
@@ -107,8 +101,16 @@
           "host": ["{{baseUrl}}"],
           "path": ["listSchools"],
           "query": [
-            { "key": "latitude",  "value": "28.6139", "description": "User's latitude (Delhi)" },
-            { "key": "longitude", "value": "77.2090", "description": "User's longitude (Delhi)" }
+            {
+              "key": "latitude",
+              "value": "28.6139",
+              "description": "User's latitude (Delhi)"
+            },
+            {
+              "key": "longitude",
+              "value": "77.2090",
+              "description": "User's longitude (Delhi)"
+            }
           ]
         },
         "description": "Returns all schools sorted nearest-first from Delhi coordinates. distance_km is calculated server-side using the Haversine formula."
@@ -131,8 +133,16 @@
           "host": ["{{baseUrl}}"],
           "path": ["listSchools"],
           "query": [
-            { "key": "latitude",  "value": "21.2514", "description": "User's latitude (Raipur)" },
-            { "key": "longitude", "value": "81.6296", "description": "User's longitude (Raipur)" }
+            {
+              "key": "latitude",
+              "value": "21.2514",
+              "description": "User's latitude (Raipur)"
+            },
+            {
+              "key": "longitude",
+              "value": "81.6296",
+              "description": "User's longitude (Raipur)"
+            }
           ]
         },
         "description": "Same data, different user location — ordering changes."
@@ -147,9 +157,7 @@
           "raw": "{{baseUrl}}/listSchools?latitude=28.6139",
           "host": ["{{baseUrl}}"],
           "path": ["listSchools"],
-          "query": [
-            { "key": "latitude", "value": "28.6139" }
-          ]
+          "query": [{ "key": "latitude", "value": "28.6139" }]
         },
         "description": "Missing longitude — demonstrates query param validation."
       },
