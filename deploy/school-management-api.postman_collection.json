@@ -37,7 +37,7 @@
         "header": [{ "key": "Content-Type", "value": "application/json" }],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"name\": \"Delhi Public School\",\n  \"address\": \"Sector 45, Noida, Uttar Pradesh\",\n  \"latitude\": 28.5706,\n  \"longitude\": 77.3261\n}"
+          "raw": "{\n  \"name\": \"Test School {{$timestamp}}\",\n  \"address\": \"Test Address, India\",\n  \"latitude\": 28.4595,\n  \"longitude\": 77.0266\n}"
         },
         "description": "Adds a new school. All four fields are required. Latitude must be -90 to 90, longitude -180 to 180."
       },
