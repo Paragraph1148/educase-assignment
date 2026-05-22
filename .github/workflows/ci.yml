@@ -125,25 +125,55 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          env: |
-            DB_HOST: ${{ secrets.RDS_HOST }}
-            DB_USER: ${{ secrets.RDS_USER }}
-            DB_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+          envs: DB_HOST,DB_USER,DB_PASSWORD,DOCKERHUB_USERNAME,IMAGE_NAME
+          env_DB_HOST: ${{ secrets.RDS_HOST }}
+          env_DB_USER: ${{ secrets.RDS_USER }}
+          env_DB_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+          env_DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          env_IMAGE_NAME: ${{ env.IMAGE_NAME }}
           script: |
-            # Pull latest image
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/school-management-api:latest
+            # Create app directory if it doesn't exist
+            mkdir -p /home/ubuntu/school-api
 
-            # Restart with new image (zero-downtime swap)
-            docker compose -f /home/ubuntu/educase-assignment/docker-compose.prod.yml down
-            docker compose -f /home/ubuntu/educase-assignment/docker-compose.prod.yml up -d
+            # Pull latest image
+            docker pull ${DOCKERHUB_USERNAME}/school-management-api:latest
+
+            # Restart with new image using docker-compose.prod.yml
+            cd /home/ubuntu/school-api
+
+            # Export environment variables for docker-compose
+            export DB_HOST=${DB_HOST}
+            export DB_USER=${DB_USER}
+            export DB_PASSWORD=${DB_PASSWORD}
+            export DB_PORT=3306
+            export DB_NAME=school_management
+            export DOCKER_IMAGE=${DOCKERHUB_USERNAME}/school-management-api
+            export IMAGE_TAG=latest
+
+            # Pull the latest docker-compose files from repo (or use local)
+            docker compose -f docker-compose.prod.yml down || true
+            docker compose -f docker-compose.prod.yml up -d
+
+            # Wait for container to be healthy
+            sleep 5
+
+            # Check if container is running
+            if docker ps | grep -q school_api; then
+              echo "✅ Deployment complete - API is running"
+            else
+              echo "❌ Deployment failed - API container not running"
+              docker logs school_api || true
+              exit 1
+            fi
 
             # Clean up old images
             docker image prune -f
-
-            echo "✅ Deployment complete"
