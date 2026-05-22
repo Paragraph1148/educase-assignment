@@ -131,13 +131,17 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
+          env: |
+            DB_HOST: ${{ secrets.RDS_HOST }}
+            DB_USER: ${{ secrets.RDS_USER }}
+            DB_PASSWORD: ${{ secrets.RDS_PASSWORD }}
           script: |
             # Pull latest image
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
 
             # Restart with new image (zero-downtime swap)
-            docker compose -f /home/ec2-user/school-api/docker-compose.prod.yml down
-            docker compose -f /home/ec2-user/school-api/docker-compose.prod.yml up -d
+            docker compose -f /home/ubuntu/school-api/docker-compose.prod.yml down
+            docker compose -f /home/ubuntu/school-api/docker-compose.prod.yml up -d
 
             # Clean up old images
             docker image prune -f
