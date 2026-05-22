@@ -137,7 +137,7 @@ jobs:
             DB_PASSWORD: ${{ secrets.RDS_PASSWORD }}
           script: |
             # Pull latest image
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/school-management-api:latest
 
             # Restart with new image (zero-downtime swap)
             docker compose -f /home/ubuntu/educase-assignment/docker-compose.prod.yml down
