@@ -122,6 +122,34 @@
           "code": 200,
           "body": "{\n  \"success\": true,\n  \"message\": \"Found 3 school(s), sorted by proximity\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"Delhi Public School\",\n      \"address\": \"Sector 45, Noida, UP\",\n      \"latitude\": 28.5706,\n      \"longitude\": 77.3261,\n      \"distance_km\": 12.43\n    },\n    {\n      \"id\": 3,\n      \"name\": \"Kendriya Vidyalaya\",\n      \"address\": \"Shankar Nagar, Raipur, CG\",\n      \"latitude\": 21.2514,\n      \"longitude\": 81.6296,\n      \"distance_km\": 895.21\n    }\n  ]\n}"
         }
+      ],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Schools are sorted nearest-first', function () {",
+              "    const json = pm.response.json();",
+              "    const schools = json.data;",
+              "",
+              "    for (let i = 0; i < schools.length - 1; i++) {",
+              "        pm.expect(schools[i].distance_km)",
+              "          .to.be.at.most(schools[i + 1].distance_km);",
+              "    }",
+              "});",
+              "",
+              "pm.test('Nearest school should be Test School', function () {",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.data[0].name).to.eql('Test School');",
+              "});"
+            ]
+          }
+        }
       ]
     },
     {
